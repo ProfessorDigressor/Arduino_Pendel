@@ -11,14 +11,13 @@ bool bRichting = false;                          //Rijrichting, true = vooruit
 int iRijSpanning = 0;                           //Waarde tussen 0 (0V) en 255 (5V)
 
 enum States{
-  stWachtenStationA,
-  stWachtenStationB,
+  stWachtenStation,
   stAanzetten,
   stRijden,
   stAfremmen
 };
 
-enum States states = stWachtenStationA;
+enum States states = stWachtenStation;
 
 void setup() {
   // put your setup code here, to run once:
@@ -37,7 +36,9 @@ void loop() {
   switch (states)
   {
     case stWachtenStation:                          //Wachten op station 
-      bRichting = ~bRichting;                       //Richting veranderen
+      
+      Serial.print(bRichting);
+        Serial.print('\n');
       setDirection(bRichting);                      //Richting naar pinnen wegschrijven 
       delay(2000);                                  //wacht 2 seconden
       states = stAanzetten;
@@ -48,8 +49,8 @@ void loop() {
       {
         iRijSpanning++;
         analogWrite(pRijspanning, iRijSpanning);    //Huidige rijstap naar PWM-pin wegschrijven
-        Serial.print(iRijSpanning);
-        Serial.print('\n');
+        //Serial.print(iRijSpanning);
+        //Serial.print('\n');
         delay(10);
       }
       states = stRijden;
@@ -61,6 +62,7 @@ void loop() {
         if (digitalRead(pSensor_2))                 //Wacht totdat je de sensor bij station B ziet
         {
           states = stAfremmen;
+          bRichting = false;                   //Richting veranderen
         }
       }
       else                                           //Achteruit, dus van B naar A
@@ -68,6 +70,7 @@ void loop() {
         if (digitalRead(pSensor_1))                  //Wacht totdat je de sensor bij station A ziet
         {
           states = stAfremmen;
+          bRichting = true;                    //Richting veranderen
         }
       }
     break;
@@ -77,8 +80,8 @@ void loop() {
        {
          iRijSpanning--;                               //Van 250 naar 0 in stapjes met 10 ms tussenpozen
          analogWrite(pRijspanning, iRijSpanning);      //Huidige rijstap naar PWM-pin wegschrijven
-         Serial.print(iRijSpanning);
-         Serial.print('\n');
+         //Serial.print(iRijSpanning);
+         //Serial.print('\n');
          delay(10);
        }
        states = stWachtenStation; 
