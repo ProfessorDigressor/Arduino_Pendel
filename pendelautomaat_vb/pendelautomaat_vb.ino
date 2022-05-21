@@ -33,12 +33,16 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  Serial.print("Sensor_1: ");
+  Serial.print(digitalRead(pSensor_1));
+  Serial.print('\t');
+  Serial.print("Sensor_2: ");
+  Serial.print(digitalRead(pSensor_2));
+  Serial.print('\n');
   switch (states)
   {
     case stWachtenStation:                          //Wachten op station 
       
-      Serial.print(bRichting);
-        Serial.print('\n');
       setDirection(bRichting);                      //Richting naar pinnen wegschrijven 
       delay(2000);                                  //wacht 2 seconden
       states = stAanzetten;
@@ -49,8 +53,6 @@ void loop() {
       {
         iRijSpanning++;
         analogWrite(pRijspanning, iRijSpanning);    //Huidige rijstap naar PWM-pin wegschrijven
-        //Serial.print(iRijSpanning);
-        //Serial.print('\n');
         delay(10);
       }
       states = stRijden;
@@ -59,7 +61,7 @@ void loop() {
     case stRijden:
       if (bRichting == true)                        //Vooruit, dus van A naar B
       {
-        if (digitalRead(pSensor_2))                 //Wacht totdat je de sensor bij station B ziet
+        if (!digitalRead(pSensor_2))                 //Wacht totdat je de sensor bij station B ziet
         {
           states = stAfremmen;
           bRichting = false;                   //Richting veranderen
@@ -67,7 +69,7 @@ void loop() {
       }
       else                                           //Achteruit, dus van B naar A
       {
-        if (digitalRead(pSensor_1))                  //Wacht totdat je de sensor bij station A ziet
+        if (!digitalRead(pSensor_1))                  //Wacht totdat je de sensor bij station A ziet
         {
           states = stAfremmen;
           bRichting = true;                    //Richting veranderen
@@ -80,8 +82,6 @@ void loop() {
        {
          iRijSpanning--;                               //Van 250 naar 0 in stapjes met 10 ms tussenpozen
          analogWrite(pRijspanning, iRijSpanning);      //Huidige rijstap naar PWM-pin wegschrijven
-         //Serial.print(iRijSpanning);
-         //Serial.print('\n');
          delay(10);
        }
        states = stWachtenStation; 
